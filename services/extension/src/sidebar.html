@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OwlerLite</title>
+  <link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+  <div class="sidebar-container">
+    <!-- Header -->
+    <div class="sidebar-header">
+      <div class="header-title">
+        <span class="logo-text">OwlerLite</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="refresh-btn" title="Refresh">↻</button>
+      </div>
+    </div>
+
+    <!-- Scope Selector (Compact) -->
+    <div class="section scope-section">
+      <div class="section-header">
+        <label class="section-label">Active Scopes</label>
+        <button class="text-btn" id="manage-scopes-btn">Manage</button>
+      </div>
+      <div id="scope-chips" class="scope-chips"></div>
+    </div>
+
+    <!-- Conversation Area -->
+    <div class="conversation-container" id="conversation-container">
+      <div class="empty-state">
+        <p class="empty-text">Select scopes and start a conversation</p>
+      </div>
+    </div>
+
+    <!-- Query Input (Bottom) -->
+    <div class="query-section">
+      <div class="query-input-wrapper">
+        <textarea 
+          id="query-input" 
+          class="query-input"
+          placeholder="Ask a question..."
+          rows="1"
+        ></textarea>
+        <button class="send-btn" id="send-btn" title="Send (Ctrl+Enter)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="status-indicator-wrapper">
+        <span class="status-dot" id="status-dot"></span>
+        <span class="status-text" id="status-text">Connecting...</span>
+      </div>
+      <button class="text-btn" id="stats-btn">Stats</button>
+    </div>
+  </div>
+
+  <!-- Stats Modal -->
+  <div id="stats-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">System Statistics</h3>
+        <button class="icon-btn" id="close-stats-btn">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Scopes</div>
+            <div class="stat-value" id="stat-scopes">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Indexed Pages</div>
+            <div class="stat-value" id="stat-pages">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Crawls</div>
+            <div class="stat-value" id="stat-crawls">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pending Updates</div>
+            <div class="stat-value" id="stat-pending">0</div>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <h4 class="stats-section-title">Recent Activity</h4>
+          <div id="recent-activity" class="activity-list">
+            <p class="empty-text">No recent activity</p>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <h4 class="stats-section-title">Crawl Queue</h4>
+          <div id="crawl-queue" class="queue-list">
+            <p class="empty-text">No pending crawls</p>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <h4 class="stats-section-title">Freshness Overview</h4>
+          <div id="freshness-overview" class="freshness-list">
+            <p class="empty-text">No freshness data available</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scope Manager Modal -->
+  <div id="scope-manager-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Manage Scopes</h3>
+        <button class="icon-btn" id="close-scope-manager-btn">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="scopes-list" class="scopes-list"></div>
+        <button class="btn btn-secondary" id="new-scope-btn" style="width: 100%; margin-top: 12px;">
+          New Scope
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="sidebar.js"></script>
+</body>
+</html>
+

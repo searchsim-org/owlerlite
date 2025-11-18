@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OwlerLite Icon Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #667eea;
+    }
+    canvas {
+      border: 1px solid #ddd;
+      margin: 10px 0;
+      display: block;
+    }
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    button:hover {
+      background: #5568d3;
+    }
+    .buttons {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>OwlerLite Icon Generator</h1>
+    <p>This page generates placeholder icons for the OwlerLite extension. Click the buttons below to download each icon size.</p>
+    
+    <div>
+      <h3>16x16</h3>
+      <canvas id="icon16" width="16" height="16"></canvas>
+    </div>
+    
+    <div>
+      <h3>48x48</h3>
+      <canvas id="icon48" width="48" height="48"></canvas>
+    </div>
+    
+    <div>
+      <h3>128x128</h3>
+      <canvas id="icon128" width="128" height="128"></canvas>
+    </div>
+    
+    <div class="buttons">
+      <button onclick="downloadIcon('icon16', 'icon16.png')">Download 16x16</button>
+      <button onclick="downloadIcon('icon48', 'icon48.png')">Download 48x48</button>
+      <button onclick="downloadIcon('icon128', 'icon128.png')">Download 128x128</button>
+    </div>
+    
+    <p style="margin-top: 20px; font-size: 14px; color: #666;">
+      Place downloaded icons in the <code>src/icons/</code> directory.
+    </p>
+  </div>
+
+  <script>
+    function drawIcon(canvasId, size) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#667eea');
+      gradient.addColorStop(1, '#764ba2');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+      
+      // Draw owl-like shape
+      ctx.fillStyle = 'white';
+      
+      // Body (rounded rectangle)
+      const bodyWidth = size * 0.6;
+      const bodyHeight = size * 0.7;
+      const bodyX = (size - bodyWidth) / 2;
+      const bodyY = size * 0.2;
+      
+      ctx.beginPath();
+      ctx.roundRect(bodyX, bodyY, bodyWidth, bodyHeight, size * 0.1);
+      ctx.fill();
+      
+      // Eyes
+      const eyeSize = size * 0.15;
+      const eyeY = bodyY + bodyHeight * 0.3;
+      
+      ctx.beginPath();
+      ctx.arc(size * 0.35, eyeY, eyeSize, 0, 2 * Math.PI);
+      ctx.arc(size * 0.65, eyeY, eyeSize, 0, 2 * Math.PI);
+      ctx.fillStyle = '#667eea';
+      ctx.fill();
+      
+      // Pupils
+      const pupilSize = eyeSize * 0.5;
+      ctx.beginPath();
+      ctx.arc(size * 0.35, eyeY, pupilSize, 0, 2 * Math.PI);
+      ctx.arc(size * 0.65, eyeY, pupilSize, 0, 2 * Math.PI);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+      
+      // Beak
+      ctx.beginPath();
+      ctx.moveTo(size * 0.5, eyeY + eyeSize);
+      ctx.lineTo(size * 0.45, eyeY + eyeSize * 1.8);
+      ctx.lineTo(size * 0.55, eyeY + eyeSize * 1.8);
+      ctx.closePath();
+      ctx.fillStyle = '#fbbf24';
+      ctx.fill();
+    }
+    
+    // Generate icons on load
+    drawIcon('icon16', 16);
+    drawIcon('icon48', 48);
+    drawIcon('icon128', 128);
+    
+    function downloadIcon(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  </script>
+</body>
+</html>
+

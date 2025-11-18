@@ -1,0 +1,15 @@
+
+syntax = "proto3";
+package urlfrontier;
+option go_package = "owlite/frontier/proto;proto";
+service FrontierService {
+  rpc Put (PutRequest) returns (PutResponse);
+  rpc GetNext (GetNextRequest) returns (stream UrlItem);
+  rpc Ack (AckRequest) returns (AckResponse);
+}
+message UrlItem { string url=1; string scope=2; string id=3; int64 priority=4; }
+message PutRequest { repeated UrlItem items=1; }
+message PutResponse { int32 accepted=1; }
+message GetNextRequest { string scope=1; int32 limit=2; }
+message AckRequest { repeated string ids=1; }
+message AckResponse { int32 acked=1; }

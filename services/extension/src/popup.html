@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OwlerLite Settings</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="popup-header">
+      <h1>OwlerLite Configuration</h1>
+    </div>
+
+    <nav class="popup-tabs">
+      <button class="popup-tab active" data-tab="config">Configuration</button>
+      <button class="popup-tab" data-tab="scopes">Scopes</button>
+      <button class="popup-tab" data-tab="stats">Statistics</button>
+    </nav>
+
+    <div class="popup-content">
+      <!-- Configuration Tab -->
+      <div id="config-tab" class="popup-tab-content active">
+      <!-- Backend Configuration -->
+      <section class="config-section">
+        <h2 class="section-title">Backend Connection</h2>
+        
+        <div class="form-group">
+          <label for="api-endpoint">API Endpoint</label>
+          <input type="text" id="api-endpoint" value="http://localhost:7001" placeholder="http://localhost:7001">
+        </div>
+
+        <div class="status-row">
+          <div class="status-indicator">
+            <span class="status-dot" id="connection-status"></span>
+            <span class="status-label" id="connection-label">Checking...</span>
+          </div>
+          <button class="btn-secondary" id="test-connection-btn">Test Connection</button>
+        </div>
+      </section>
+
+      <!-- API Keys -->
+      <section class="config-section">
+        <h2 class="section-title">LLM API Keys</h2>
+        <p class="section-description">Configure API keys for language models and embeddings</p>
+
+        <div class="form-group">
+          <label for="llm-provider">LLM Provider</label>
+          <select id="llm-provider">
+            <option value="openai">OpenAI</option>
+            <option value="anthropic">Anthropic</option>
+            <option value="local">Local</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="llm-api-key">LLM API Key</label>
+          <input type="password" id="llm-api-key" placeholder="sk-...">
+        </div>
+
+        <div class="form-group">
+          <label for="llm-model">LLM Model</label>
+          <input type="text" id="llm-model" value="gpt-4o-mini" placeholder="gpt-4o-mini">
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="form-group">
+          <label for="embedding-provider">Embedding Provider</label>
+          <select id="embedding-provider">
+            <option value="openai">OpenAI</option>
+            <option value="cohere">Cohere</option>
+            <option value="local">Local</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="embedding-api-key">Embedding API Key</label>
+          <input type="password" id="embedding-api-key" placeholder="sk-...">
+        </div>
+
+        <div class="form-group">
+          <label for="embedding-model">Embedding Model</label>
+          <input type="text" id="embedding-model" value="text-embedding-3-small" placeholder="text-embedding-3-small">
+        </div>
+
+        <button class="btn-primary" id="save-api-keys-btn" style="width: 100%;">Save API Keys</button>
+      </section>
+
+      <!-- Retrieval Settings -->
+      <section class="config-section">
+        <h2 class="section-title">Retrieval Settings</h2>
+        
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Score Breakdown</div>
+            <div class="setting-desc">Show detailed scoring in results</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="show-scores" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Freshness Indicators</div>
+            <div class="setting-desc">Display semantic freshness badges</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="show-freshness" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Auto-tracking</div>
+            <div class="setting-desc">Auto-add pages matching patterns</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="enable-auto-track">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Quick Actions -->
+      <section class="config-section">
+        <h2 class="section-title">Quick Actions</h2>
+        
+        <div class="action-buttons">
+          <button class="btn-primary" id="open-sidebar-btn" style="width: 100%;">Open Sidebar (Ctrl+Shift+O)</button>
+        </div>
+      </section>
+      </div>
+
+      <!-- Scopes Tab -->
+      <div id="scopes-tab" class="popup-tab-content">
+      <!-- Scope Management -->
+      <section class="config-section">
+        <h2 class="section-title">Scope Management</h2>
+        
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-value" id="total-scopes">0</div>
+            <div class="stat-label">Total Scopes</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="total-pages">0</div>
+            <div class="stat-label">Indexed Pages</div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn-secondary" id="view-scopes-btn" style="flex: 1;">View Scopes</button>
+          <button class="btn-primary" id="new-scope-btn" style="flex: 1;">New Scope</button>
+        </div>
+      </section>
+      </div>
+
+      <!-- Statistics Tab -->
+      <div id="stats-tab" class="popup-tab-content">
+      <!-- Data Management -->
+      <section class="config-section">
+        <h2 class="section-title">Data Management</h2>
+        
+        <div class="action-buttons">
+          <button class="btn-secondary" id="export-data-btn">Export Data</button>
+          <button class="btn-secondary" id="import-data-btn">Import Data</button>
+          <button class="btn-secondary" id="clear-cache-btn">Clear Cache</button>
+        </div>
+      </section>
+
+      <!-- System Information -->
+      <section class="config-section">
+        <h2 class="section-title">System Information</h2>
+        
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-value" id="stat-indexed">0</div>
+            <div class="stat-label">Indexed Pages</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="stat-crawls">0</div>
+            <div class="stat-label">Active Crawls</div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-value" id="stat-fresh">0%</div>
+            <div class="stat-label">Fresh Content</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" id="stat-pending">0</div>
+            <div class="stat-label">Pending Updates</div>
+          </div>
+        </div>
+      </section>
+      </div>
+    </div>
+
+    <div class="popup-footer">
+      <span class="version-text">OwlerLite v1.0.0</span>
+    </div>
+  </div>
+
+  <!-- Scope Editor Modal -->
+  <div id="scope-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">New Scope</h3>
+        <button class="close-btn" id="close-modal-btn">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="scope-id">
+        
+        <div class="form-group">
+          <label for="scope-name">Name</label>
+          <input type="text" id="scope-name" placeholder="e.g., Python Documentation">
+        </div>
+        
+        <div class="form-group">
+          <label for="scope-description">Description</label>
+          <textarea id="scope-description" rows="2" placeholder="What does this scope contain?"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="scope-patterns">URL Patterns (one per line)</label>
+          <textarea id="scope-patterns" rows="3" placeholder="https://docs.python.org/*"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="scope-auto-track">
+            Auto-track pages matching these patterns
+          </label>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn-secondary" id="cancel-scope-btn" style="flex: 1;">Cancel</button>
+          <button class="btn-primary" id="save-scope-btn" style="flex: 1;">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scopes List Modal -->
+  <div id="scopes-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>All Scopes</h3>
+        <button class="close-btn" id="close-scopes-modal-btn">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="scopes-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

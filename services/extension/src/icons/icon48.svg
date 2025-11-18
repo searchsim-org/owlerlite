@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="48" height="48" fill="url(#grad)" />
+  
+  <!-- Owl body -->
+  <ellipse cx="24" cy="26.400000000000002" rx="14.399999999999999" ry="16.799999999999997" fill="white" />
+  
+  <!-- Eyes -->
+  <circle cx="19.200000000000003" cy="21.6" r="3.84" fill="#667eea" />
+  <circle cx="28.799999999999997" cy="21.6" r="3.84" fill="#667eea" />
+  
+  <!-- Pupils -->
+  <circle cx="19.200000000000003" cy="21.6" r="1.92" fill="white" />
+  <circle cx="28.799999999999997" cy="21.6" r="1.92" fill="white" />
+  
+  <!-- Beak -->
+  <polygon points="24,24.96 22.080000000000002,27.839999999999996 25.92,27.839999999999996" fill="#fbbf24" />
+  
+  <!-- Wings -->
+  <ellipse cx="15.36" cy="28.799999999999997" rx="3.84" ry="5.76" fill="#e5e7eb" transform="rotate(-20 15.36 28.799999999999997)" />
+  <ellipse cx="32.64" cy="28.799999999999997" rx="3.84" ry="5.76" fill="#e5e7eb" transform="rotate(20 32.64 28.799999999999997)" />
+</svg>

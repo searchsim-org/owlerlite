@@ -1,0 +1,88 @@
+services:
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    container_name: owlerlite_api
+    ports:
+      - "7001:7001"
+    environment:
+      - LIGHTRAG_URL=http://lightrag:9621
+      - CRAWLER_URL=http://crawler:8081
+      - FRONTIER_URL=http://frontier:7072
+      - ORCHESTRATOR_URL=http://orchestrator:7000
+    depends_on:
+      lightrag: { condition: service_healthy }
+    networks: [owl]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
+  lightrag:
+    build: { context: ./services/lightrag }
+    container_name: owlerlite_lightrag
+    ports: ["9621:9621"]
+    env_file: [ ./services/lightrag/.env.example ]
+    environment:
+      - LLM_BINDING_HOST=${LLM_BINDING_HOST}
+      - LLM_BINDING_API_KEY=${LLM_BINDING_API_KEY}
+      - EMBEDDING_BINDING_HOST=${EMBEDDING_BINDING_HOST}
+      - EMBEDDING_BINDING_API_KEY=${EMBEDDING_BINDING_API_KEY}
+      - LLM_MODEL=${LLM_MODEL}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL}
+      - EMBEDDING_DIM=${EMBEDDING_DIM}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9621/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 30
+    networks: [owl]
+  frontier:
+    build:
+      context: ./services
+      dockerfile: frontier/Dockerfile
+    container_name: owlerlite_frontier
+    ports: ["7071:7071","7072:7072"]
+    networks: [owl]
+  orchestrator:
+    build: { context: ./services/orchestrator }
+    container_name: owlerlite_orchestrator
+    environment:
+      - LIGHTRAG_BASE_URL=http://lightrag:9621
+      - FRONTIER_GRPC_ADDR=frontier:7071
+      - SQLITE_PATH=/data/owlerlite.db
+      - RAG_SCOPE_ALPHA=0.7
+      - RAG_FRESH_DELTA=0.2
+      - RAG_KG_GAMMA=0.15
+      - CRAWLER_BASE=http://crawler:8081
+    volumes: [ "orchestrator-data:/data" ]
+    ports: ["7000:7000"]
+    depends_on: { lightrag: { condition: service_healthy } }
+    networks: [owl]
+  crawler:
+    build:
+      context: ./services
+      dockerfile: crawler/Dockerfile
+    container_name: owlerlite_crawler
+    environment:
+      - FRONTIER_GRPC_ADDR=frontier:7071
+      - LIGHTRAG_BASE_URL=http://lightrag:9621
+      - SQLITE_PATH=/data/crawler.db
+      - USER_AGENT=OwlerLite/0.2
+      - CRAWL_DELAY_MS=500
+    volumes: [ "crawler-data:/data", "warc-data:/warc" ]
+    ports: ["8081:8081"]
+    depends_on: { lightrag: { condition: service_healthy } }
+    networks: [owl]
+  ui:
+    build: { context: ./services/ui }
+    container_name: owlerlite_ui
+    environment: [ "NEXT_PUBLIC_API_BASE=http://localhost:7001" ]
+    ports: ["3000:3000"]
+    depends_on: [ api ]
+    networks: [owl]
+volumes: { crawler-data: {}, orchestrator-data: {}, warc-data: {} }
+networks: { owl: {} }
