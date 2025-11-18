@@ -224,6 +224,10 @@ Where:
 ```
 owlerlite/
 ├── services/
+│   ├── api/                  # REST API service
+│   │   ├── main.py           # API service entry point
+│   │   ├── requirements.txt  # Python dependencies
+│   │   └── Dockerfile
 │   ├── crawler/              # Web content fetching and change detection
 │   │   ├── main.go           # Crawler service entry point
 │   │   └── Dockerfile
