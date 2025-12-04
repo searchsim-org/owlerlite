@@ -69,10 +69,12 @@ To query with a specific scope in the demo:
 
 <p align="center"><em>Example: Querying with <code>@msmarco</code> scope to retrieve context exclusively from the MS MARCO collection</em></p>
 
-<p align="center">
-  <!-- Demo video placeholder -->
-  <em>🎬 Demo video coming soon</em>
+<p align="center" width="100%">
+  <video src="https://github.com/user-attachments/assets/dc8f9606-59b1-41ab-81d7-d64867d699ff"
+         width="80%" controls>
+  </video>
 </p>
+
 
 ---
 
