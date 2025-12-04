@@ -33,6 +33,49 @@ The system builds on concepts from OWLer, a collaborative open web crawler, but 
 
 <p align="center"><em>OwlerLite browser extension: Configuration, Scope Management, and Query Interface</em></p>
 
+## [DEMO] Using OwlerLite for RAG
+
+OwlerLite can be used as a scope- and freshness-aware RAG system in two ways:
+
+### Browser Extension
+Install the browser extension to create and manage your own scopes, add web resources, and query with full control over which sources are consulted. See the [Installation](#installation) section for setup instructions.
+
+### Live Demo
+
+We provide a **[runnable demo](https://dekis.pads.fim.uni-passau.de/)** where you can experience OwlerLite without any installation.
+
+In the demo, you can:
+- **Choose a model**: Select from available LLM backends for answer generation
+- **Select a scope**: Pick which indexed collection to query against
+- **Query with scope exclusivity**: The retrieval context is restricted exclusively to the selected scope, ensuring answers are grounded only in your chosen sources
+
+#### Available Scopes (with more coming soon)
+
+| Scope | Description |
+|-------|-------------|
+| **MS MARCO** | A freshly crawled and indexed partition of the original 3.5 million URLs from the [MS MARCO](https://microsoft.github.io/msmarco/) dataset, continuously updated with semantic freshness tracking |
+
+#### How to Search with Scopes
+
+To query with a specific scope in the demo:
+
+1. **Type your query** in the input field
+2. **Mention the scope** using the `@` syntax (e.g., `@msmarco`) to restrict retrieval to that scope
+3. **Submit your query** — the system will only retrieve context from the selected scope
+
+<p align="center">
+  <img src="images/scope_search.png" alt="Scope-aware search example" width="70%">
+</p>
+
+<p align="center"><em>Example: Querying with <code>@msmarco</code> scope to retrieve context exclusively from the MS MARCO collection</em></p>
+
+<p align="center">
+  <!-- Demo video placeholder -->
+  <em>🎬 Demo video coming soon</em>
+</p>
+
+---
+
 ## Key Features
 
 ### Scope-Aware Retrieval
