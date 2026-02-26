@@ -42,7 +42,7 @@ Install the browser extension to create and manage your own scopes, add web reso
 
 ### Live Demo
 
-We provide a **[runnable demo](https://dekis.pads.fim.uni-passau.de/)** where you can experience OwlerLite without any installation.
+We provide a **[runnable demo](https://uxsim.pads.fim.uni-passau.de/)** where you can experience OwlerLite without any installation.
 
 In the demo, you can:
 - **Choose a model**: Select from available LLM backends for answer generation
