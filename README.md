@@ -40,16 +40,23 @@ OwlerLite can be used as a scope- and freshness-aware RAG system in two ways:
 ### Browser Extension
 Install the browser extension to create and manage your own scopes, add web resources, and query with full control over which sources are consulted. See the [Installation](#installation) section for setup instructions.
 
-### Live Demo
+### Video Demo
 
-We provide a **[runnable demo](https://uxsim.pads.fim.uni-passau.de/)** where you can experience OwlerLite without any installation.
+A recorded walkthrough of OwlerLite shows the end-to-end experience:
 
-In the demo, you can:
-- **Choose a model**: Select from available LLM backends for answer generation
-- **Select a scope**: Pick which indexed collection to query against
-- **Query with scope exclusivity**: The retrieval context is restricted exclusively to the selected scope, ensuring answers are grounded only in your chosen sources
+- **Choosing a model**: Selecting from available LLM backends for answer generation
+- **Selecting a scope**: Picking which indexed collection to query against
+- **Querying with scope exclusivity**: The retrieval context is restricted exclusively to the selected scope, ensuring answers are grounded only in the chosen sources
 
-#### Available Scopes (with more coming soon)
+<p align="center" width="100%">
+  <video src="https://github.com/user-attachments/assets/dc8f9606-59b1-41ab-81d7-d64867d699ff"
+         width="80%" controls>
+  </video>
+</p>
+
+<p align="center"><em>Walkthrough: model selection, scope selection, and scope-exclusive querying</em></p>
+
+#### Featured Scope
 
 | Scope | Description |
 |-------|-------------|
@@ -57,7 +64,7 @@ In the demo, you can:
 
 #### How to Search with Scopes
 
-To query with a specific scope in the demo:
+As shown in the video, to query with a specific scope:
 
 1. **Type your query** in the input field
 2. **Mention the scope** using the `@` syntax (e.g., `@msmarco`) to restrict retrieval to that scope
@@ -68,13 +75,6 @@ To query with a specific scope in the demo:
 </p>
 
 <p align="center"><em>Example: Querying with <code>@msmarco</code> scope to retrieve context exclusively from the MS MARCO collection</em></p>
-
-<p align="center" width="100%">
-  <video src="https://github.com/user-attachments/assets/dc8f9606-59b1-41ab-81d7-d64867d699ff"
-         width="80%" controls>
-  </video>
-</p>
-
 
 ---
 
@@ -224,14 +224,14 @@ Powered by `services/extension/`, providing:
 
 ### Core Technologies
 - **Backend**: Go 1.22+, Docker, gRPC, URLFrontier protocol
-- **Frontend**: TypeScript, Web Extensions API (Manifest V3)
+- **Frontend**: TypeScript, Web Extensions API (Manifest V3), Next.js (Web UI)
 - **RAG Framework**: LightRAG (vector + knowledge graph)
 - **Semantic Hashing**: SimHash with 5-gram shingles
 - **Storage**: Vector store and graph database via LightRAG
 
 ### Semantic Freshness Model
 
-The system implements chunk-level freshness detection:
+The system implements chunk-level freshness detection with **two-threshold classification**:
 
 **Change Detection**: For each chunk pair (c_old, c_new):
 ```
@@ -241,8 +241,9 @@ The system implements chunk-level freshness detection:
 Where s(c) is the 64-bit SimHash signature.
 
 **Thresholds**:
-- τ₁ = 0.98: Chunks with σ > τ₁ are unchanged
-- τ₂ = 0.90: Chunks with σ < τ₂ are semantically updated
+- **τ₁ = 0.97 (Hamming ≤ 2)**: Chunks with σ ≥ τ₁ are unchanged — skip re-indexing
+- **τ₂ = 0.90 (Hamming ≥ 6)**: Chunks with σ ≤ τ₂ are semantically updated — always re-index
+- **Intermediate band [τ₂, τ₁]**: Use embedding-based SemDeDup to decide
 
 ### Retrieval Objective
 
@@ -257,11 +258,44 @@ Where:
 - `g(p; S_q)`: Scope prior (1.0 if p in selected scopes, γ otherwise)
 - `fresh(p)`: Freshness signal (exponential decay from last update)
 
+**Default parameters**: α=0.8, β=0.2, δ=0.15, γ=0.1
+
 ### Privacy Engineering
 - Self-hosted infrastructure: all components run locally or on user-controlled servers
 - No external data transmission: user data never leaves configured boundaries
 - Configurable API endpoints: choose cloud or local LLM providers
 - Transparent operation: full visibility into crawling, indexing, and retrieval
+
+---
+
+## New Features
+
+### Web UI (Alternative to Browser Extension)
+A full-featured Next.js web interface at `http://localhost:3000`:
+- **Query interface** with scope selection chips
+- **Score breakdown visualization** showing semantic, graph, scope, and freshness contributions
+- **Version diff modal** with highlighted additions/removals
+- **Crawler stats dashboard** showing pages, chunks, and versions
+
+### Natural Language Rationale
+Query responses optionally include LLM-generated explanations of why results were ranked as shown. Enable with `generate_nl: true` in query requests.
+
+### Evaluation Harness
+Offline evaluation matching the paper's TREC 2024 RAG protocol:
+```bash
+cd evaluation
+pip install -r requirements.txt
+python run_eval.py
+```
+
+Implements:
+- **SF@k (Scope Fidelity)**: Fraction of top-k results from target scope
+- **SL@k (Scope Leakage)**: Fraction of top-k results outside target scope
+- **NDCG@10**: Normalized DCG with graded relevance
+- **Synthetic scope clustering**: K-means on document embeddings
+
+### robots.txt Compliance
+The crawler respects `robots.txt` rules with per-host caching.
 
 ## Development
 
