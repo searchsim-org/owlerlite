@@ -1,0 +1,76 @@
+# Dependencies
+node_modules/
+vendor/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build outputs
+dist/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Service data (local development)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Docker volumes (mounted data)
+crawler-data/
+orchestrator-data/
+frontier-data/
+lightrag-data/
+warc-data/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Next.js
+.next/
+out/
+
+# Test coverage
+coverage/
+htmlcov/
+.coverage
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Secrets and credentials
+*.pem
+*.key
+secrets/
+
+# WARC archives (can be large)
+/warc/
+
+evaluation/
+
+# OS files
+Thumbs.db
+
+
+# Custom - service secrets
+services/lightrag/.env

@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use OwlerLite in your research, please cite our WWW 2026 paper."
+title: "OwlerLite: Scope- and Freshness-Aware Web Retrieval for LLM Assistants"
+authors:
+  - family-names: Zerhoudi
+    given-names: Saber
+  - family-names: Dinzinger
+    given-names: Michael
+  - family-names: Granitzer
+    given-names: Michael
+  - family-names: Mitrović
+    given-names: Jelena
+preferred-citation:
+  type: conference-paper
+  title: "OwlerLite: Scope- and Freshness-Aware Web Retrieval for LLM Assistants"
+  authors:
+    - family-names: Zerhoudi
+      given-names: Saber
+    - family-names: Dinzinger
+      given-names: Michael
+    - family-names: Granitzer
+      given-names: Michael
+    - family-names: Mitrović
+      given-names: Jelena
+  collection-title: "Companion Proceedings of the ACM Web Conference 2026 (WWW Companion 2026)"
+  conference:
+    name: "The ACM Web Conference 2026"
+    location: "Dubai, United Arab Emirates"
+  year: 2026
+  start: 216
+  end: 220
+  publisher:
+    name: "ACM"
+  doi: 10.1145/3774905.3793140
+  url: "https://doi.org/10.1145/3774905.3793140"

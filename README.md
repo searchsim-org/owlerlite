@@ -1,343 +1,235 @@
-# OwlerLite: Scope- and Freshness-Aware Browser-Based RAG
+<div align="center">
+
+# OwlerLite
+
+### Scope- and Freshness-Aware Web Retrieval for LLM Assistants
+
+*A browser-based RAG system where you choose which sources an assistant can use, and a crawler keeps them up to date.*
+
+[![WWW 2026](https://img.shields.io/badge/WWW_2026-Companion-1f6feb?style=flat-square)](https://doi.org/10.1145/3774905.3793140)
+[![DOI](https://img.shields.io/badge/DOI-10.1145%2F3774905.3793140-1f6feb?style=flat-square)](https://doi.org/10.1145/3774905.3793140)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+[![Extension: Manifest V3](https://img.shields.io/badge/Extension-Manifest_V3-34a853?style=flat-square)](#installation)
+[![Backend: Go + Python](https://img.shields.io/badge/Backend-Go_%2B_Python-00ADD8?style=flat-square)](#architecture)
 
 ![OwlerLite Architecture](images/owlerlite.png)
 
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
-[![Paper](https://img.shields.io/badge/Paper-arXiv-b31b1b?style=flat-square)](https://arxiv.org)
+**[Saber Zerhoudi](mailto:szerhoudi@acm.org), Michael Dinzinger, Michael Granitzer, Jelena Mitrović**
+Published at **The ACM Web Conference 2026 (WWW Companion), Dubai** &nbsp;·&nbsp; pp. 216–220 &nbsp;·&nbsp; [Read the paper](https://doi.org/10.1145/3774905.3793140)
 
-This repository contains the implementation of **OwlerLite: Scope- and Freshness-Aware Web Retrieval for LLM Assistants**.
+</div>
+
+> **What is this?** Most browser RAG tools answer from a fixed index that you cannot control or refresh. OwlerLite is a browser extension with a self-hosted backend that lets you group web pages into named **scopes** and pick which scope each query uses. A crawler re-checks those pages, detects meaningful changes, and re-indexes them, so answers stay current.
+>
+> **Who is it for?** IR/RAG researchers studying controllable retrieval, and practitioners who want a trustworthy, self-hosted web assistant.
+
+**Contents:** [Abstract](#abstract) · [Highlights](#highlights) · [Citation](#citation) · [Demo](#demo) · [Quick Start](#quick-start) · [Installation](#installation) · [Usage](#usage) · [Architecture](#architecture) · [Method](#method) · [Evaluation](#evaluation) · [Related Work](#related-work)
 
 ---
 
 ## Abstract
 
-> Browser-based language models often use retrieval-augmented generation (RAG) but typically rely on fixed, outdated indices that give users no control over which sources are consulted. This can lead to answers that mix trusted and untrusted content or draw on stale information. We present OwlerLite, a browser-based RAG system that makes user-defined scopes and data freshness central to retrieval. Users define reusable scopes-sets of web pages or sources-and select them when querying. A freshness-aware crawler monitors live pages, uses a semantic change detector to identify meaningful updates, and selectively re-indexes changed content. OwlerLite integrates text relevance, scope choice, and recency into a unified retrieval model. Implemented as a browser extension, it represents a step toward more controllable and trustworthy web assistants.
+> Browser-based language models often use retrieval-augmented generation (RAG) but typically rely on fixed, outdated indices that give users no control over which sources are consulted. This can lead to answers that mix trusted and untrusted content or draw on stale information. We present **OwlerLite**, a browser-based RAG system that makes user-defined **scopes** and data **freshness** central to retrieval. Users define reusable scopes — sets of web pages or sources — and select them when querying. A freshness-aware crawler monitors live pages, uses a semantic change detector to identify meaningful updates, and selectively re-indexes changed content. OwlerLite integrates text relevance, scope choice, and recency into a unified retrieval model. Implemented as a browser extension, it represents a step toward more controllable and trustworthy web assistants.
 
-**Keywords**: *Retrieval-Augmented Generation • Browser Extensions • Semantic Freshness • Knowledge Graph Retrieval • Explainable Information Retrieval*
-
----
-
-A browser-based RAG system that enables persistent, scoped retrieval over user-defined web collections with semantic freshness tracking and transparent provenance.
-
-## Overview
-
-OwlerLite is a browser extension and backend service that provides scope-aware retrieval-augmented generation over curated web resources. Unlike traditional RAG systems that operate over static indices or web-search-enabled assistants that rely on ephemeral queries, OwlerLite maintains persistent, user-defined scopes and tracks semantic changes at the chunk level.
-
-The system builds on concepts from OWLer, a collaborative open web crawler, but targets a different layer: persistent, scoped, and versioned corpora for browser-based RAG rather than large-scale general-purpose crawling.
-
-<p align="center">
-  <img src="images/owlerlite_config_01.png" alt="Configuration Interface" width="32%">
-  <img src="images/owlerlite_config_02.png" alt="Scope Management" width="32%">
-  <img src="images/owlerlite_sidebar.png" alt="Query Sidebar" width="32%">
-</p>
-
-<p align="center"><em>OwlerLite browser extension: Configuration, Scope Management, and Query Interface</em></p>
-
-## [DEMO] Using OwlerLite for RAG
-
-OwlerLite can be used as a scope- and freshness-aware RAG system in two ways:
-
-### Browser Extension
-Install the browser extension to create and manage your own scopes, add web resources, and query with full control over which sources are consulted. See the [Installation](#installation) section for setup instructions.
-
-### Video Demo
-
-A recorded walkthrough of OwlerLite shows the end-to-end experience:
-
-- **Choosing a model**: Selecting from available LLM backends for answer generation
-- **Selecting a scope**: Picking which indexed collection to query against
-- **Querying with scope exclusivity**: The retrieval context is restricted exclusively to the selected scope, ensuring answers are grounded only in the chosen sources
-
-<p align="center" width="100%">
-  <video src="https://github.com/user-attachments/assets/dc8f9606-59b1-41ab-81d7-d64867d699ff"
-         width="80%" controls>
-  </video>
-</p>
-
-<p align="center"><em>Walkthrough: model selection, scope selection, and scope-exclusive querying</em></p>
-
-#### Featured Scope
-
-| Scope | Description |
-|-------|-------------|
-| **MS MARCO** | A freshly crawled and indexed partition of the original 3.5 million URLs from the [MS MARCO](https://microsoft.github.io/msmarco/) dataset, continuously updated with semantic freshness tracking |
-
-#### How to Search with Scopes
-
-As shown in the video, to query with a specific scope:
-
-1. **Type your query** in the input field
-2. **Mention the scope** using the `@` syntax (e.g., `@msmarco`) to restrict retrieval to that scope
-3. **Submit your query** — the system will only retrieve context from the selected scope
-
-<p align="center">
-  <img src="images/scope_search.png" alt="Scope-aware search example" width="70%">
-</p>
-
-<p align="center"><em>Example: Querying with <code>@msmarco</code> scope to retrieve context exclusively from the MS MARCO collection</em></p>
+**Keywords** &nbsp;·&nbsp; *Retrieval-Augmented Generation · Browser Extensions · Semantic Freshness · Knowledge Graph Retrieval · Explainable Information Retrieval*
 
 ---
 
-## Key Features
+## Highlights
 
-### Scope-Aware Retrieval
-- **Explicit scope definition**: Users create named scopes corresponding to sets of web resources
-- **Multi-scope queries**: Select one or more scopes at query time for focused retrieval
-- **Scope fidelity**: Retrieval prioritizes passages from selected scopes
-- **Reusable configurations**: Scopes persist across sessions and can be exported/imported
+- **Scope-exclusive retrieval:** answers come only from the collections you select, using an `@scope` syntax (for example, `@msmarco`).
+- **Semantic freshness tracking:** a two-threshold SimHash check re-indexes only the chunks whose meaning changed, and skips the rest.
+- **Unified scoring:** one retrieval score combines vector similarity, knowledge-graph evidence, scope priors, and recency.
+- **Transparent provenance:** every result shows how much its semantic, graph, scope, and freshness components added to the score.
+- **Self-hosted and private:** crawling, indexing, and retrieval all run on your own infrastructure.
 
-### Semantic Freshness Tracking
-- **Chunk-level change detection**: SimHash fingerprints detect meaningful content changes
-- **Selective re-ingestion**: Only semantically updated chunks are re-indexed
-- **Freshness signals**: Retrieval scores incorporate recency and update patterns
-- **Version lineage**: Track how content evolves over time with diff views
+---
 
-### Transparent Provenance
-- **Score breakdowns**: See semantic similarity, graph evidence, scope priors, and freshness contributions
-- **Scope badges**: Visual indicators of which collections contain each result
-- **Version information**: Timestamps and version identifiers for retrieved passages
-- **Explanation interface**: Detailed provenance for every answer
+## Citation
 
-### Privacy-Preserving Architecture
-- **Local processing**: All data remains on your infrastructure
-- **Self-hosted backend**: Complete control over crawling, indexing, and retrieval
-- **No external dependencies**: Optional cloud LLM integration with user-provided keys
+If you find OwlerLite useful in your research, please cite our WWW 2026 paper. You can also use the **"Cite this repository"** button in the sidebar (powered by [`CITATION.cff`](CITATION.cff)).
 
-## Architecture
+```bibtex
+@inproceedings{Zerhoudi:2026:WWW,
+  author    = {Saber Zerhoudi and Michael Dinzinger and Michael Granitzer and Jelena Mitrovic},
+  title     = {OwlerLite: Scope- and Freshness-Aware Web Retrieval for {LLM} Assistants},
+  booktitle = {Companion Proceedings of the {ACM} Web Conference 2026 (WWW Companion 2026),
+               Dubai, United Arab Emirates, 29 June -- 3 July 2026},
+  pages     = {216--220},
+  publisher = {{ACM}},
+  year      = {2026},
+  url       = {https://doi.org/10.1145/3774905.3793140},
+  doi       = {10.1145/3774905.3793140}
+}
+```
 
-The system consists of three main subsystems as described in the research:
+> **ACM Reference Format:** Saber Zerhoudi, Michael Dinzinger, Michael Granitzer, and Jelena Mitrović. 2026. OwlerLite: Scope- and Freshness-Aware Web Retrieval for LLM Assistants. In *Companion Proceedings of the ACM Web Conference 2026 (WWW Companion 2026)*. ACM, 216–220. https://doi.org/10.1145/3774905.3793140
 
-### 1. Freshness-Aware Crawler and Ingester
-Located in `services/crawler/`, this component:
-- Monitors web resources associated with user-defined scopes
-- Extracts main content using DOM-based readability heuristics
-- Computes 64-bit SimHash signatures over 5-gram shingles for each chunk
-- Detects semantic changes by comparing signatures across versions
-- Selectively re-ingests only chunks that cross similarity thresholds
+---
 
-### 2. LightRAG-Based Retrieval Backend
-Implemented across `services/orchestrator/` and `services/lightrag/`, featuring:
-- Vector store for dense passage embeddings
-- Knowledge graph with entities and relations
-- Scope and version metadata annotation
-- Hybrid scoring function combining semantic similarity, graph evidence, scope priors, and freshness
-- Filter-based candidate generation restricted to selected scopes
+## Demo
 
-### 3. Browser Extension Frontend
-Powered by `services/extension/`, providing:
-- Sidebar interface for conversational queries
-- Scope management (create, edit, delete, export/import)
-- Configuration interface for API keys and backend settings
-- Statistics dashboard showing crawl status and freshness metrics
-- Real-time backend connection monitoring
+A recorded walkthrough that covers picking a model, selecting a scope, and running a query whose results come only from that scope:
+
+<p align="center">
+  <video src="https://github.com/user-attachments/assets/dc8f9606-59b1-41ab-81d7-d64867d699ff" width="80%" controls></video>
+</p>
+
+<p align="center">
+  <img src="images/owlerlite_config_01.png" alt="Configuration interface" width="32%">
+  <img src="images/owlerlite_config_02.png" alt="Scope management" width="32%">
+  <img src="images/owlerlite_sidebar.png" alt="Query sidebar" width="32%">
+</p>
+<p align="center"><em>Configuration &nbsp;·&nbsp; Scope management &nbsp;·&nbsp; Query sidebar</em></p>
+
+**Featured scope (`@msmarco`):** a freshly crawled partition of the 3.5M-URL [MS MARCO](https://microsoft.github.io/msmarco/) corpus, kept up to date with freshness tracking.
+
+---
+
+## Quick Start
+
+```bash
+git clone https://github.com/searchsim-org/www26-owlerlite && cd www26-owlerlite
+cp services/lightrag/.env.example services/lightrag/.env   # add your LLM keys
+make setup && make build && make up                        # backend on :7001, web UI on :3000
+```
+
+Then [load the browser extension](#installation) and point it at `http://localhost:7001`.
+
+**Prerequisites:** Docker and Docker Compose · Go 1.22+ (for local development) · a modern browser (Chrome, Firefox, or Edge) · an OpenAI-compatible LLM key.
+
+---
 
 ## Installation
 
-### Prerequisites
-- Docker and Docker Compose
-- Go 1.22+ (for local development)
-- Modern web browser (Chrome, Firefox, or Edge)
-- OpenAI API key (or compatible LLM endpoint)
+<details>
+<summary><b>1 · Configure the backend</b></summary>
 
-### Setup
+Edit `services/lightrag/.env`:
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-org/owlerlite
-   cd owlerlite
-   ```
+```bash
+LLM_BINDING_HOST=https://api.openai.com/v1
+LLM_BINDING_API_KEY=your-openai-api-key
+LLM_MODEL=gpt-4o-mini
 
-2. **Configure LightRAG**
-   
-   Edit `services/lightrag/.env.example` with your API credentials:
-   ```bash
-   LLM_BINDING_HOST=https://api.openai.com/v1
-   LLM_BINDING_API_KEY=your-openai-api-key
-   LLM_MODEL=gpt-4o-mini
-   
-   EMBEDDING_BINDING_HOST=https://api.openai.com/v1
-   EMBEDDING_BINDING_API_KEY=your-openai-api-key
-   EMBEDDING_MODEL=text-embedding-3-small
-   EMBEDDING_DIM=1536
-   ```
-
-3. **Build and start backend services**
-   ```bash
-   make setup  # Generate protobuf files and dependencies
-   make build  # Build all Docker images
-   make up     # Start all services
-   ```
-
-4. **Install browser extension**
-   
-   Navigate to `services/extension/`:
-   
-   **Firefox:**
-   - Open `about:debugging#/runtime/this-firefox`
-   - Click "Load Temporary Add-on"
-   - Select `services/extension/dist/manifest.json`
-   
-   **Chrome/Edge:**
-   - Navigate to `chrome://extensions/` or `edge://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select `services/extension/dist` folder
-
-5. **Configure the extension**
-   - Click the OwlerLite extension icon
-   - Enter the API endpoint: `http://localhost:7001`
-   - Add your LLM API keys (same as backend configuration)
-   - Test the connection to verify backend availability
-
-## Usage
-
-### Basic Operation
-
-1. **Define scopes**: Click the extension icon → Create new scope → Add URL patterns or individual pages
-2. **Add resources**: Use the "Add Page" feature to include the current browser tab in a scope
-3. **Query with scopes**: Open sidebar (Ctrl+Shift+O) → Select scopes → Type your question
-4. **Review results**: See ranked passages with score breakdowns and freshness indicators
-5. **Track changes**: Monitor semantic updates through version information and diffs
-
-### Advanced Features
-
-#### Scope Management
-- Create scopes with URL pattern matching (e.g., `https://docs.python.org/*`)
-- Enable auto-tracking to automatically add visited pages to matching scopes
-- Export/import scope configurations for backup or sharing
-- View scope statistics: pattern count, indexed pages, freshness status
-
-#### Conversational Interface
-- Chat-like sidebar interface for natural interaction
-- Results appear inline within the conversation
-- Context-aware follow-up questions
-- Expandable score breakdowns and explanations
-
-#### System Monitoring
-- Real-time crawl queue status
-- Active crawls and pending updates count
-- Recent activity log
-- Freshness overview per scope
-- Backend connection health indicator
-
-## Technical Implementation
-
-### Core Technologies
-- **Backend**: Go 1.22+, Docker, gRPC, URLFrontier protocol
-- **Frontend**: TypeScript, Web Extensions API (Manifest V3), Next.js (Web UI)
-- **RAG Framework**: LightRAG (vector + knowledge graph)
-- **Semantic Hashing**: SimHash with 5-gram shingles
-- **Storage**: Vector store and graph database via LightRAG
-
-### Semantic Freshness Model
-
-The system implements chunk-level freshness detection with **two-threshold classification**:
-
-**Change Detection**: For each chunk pair (c_old, c_new):
+EMBEDDING_BINDING_HOST=https://api.openai.com/v1
+EMBEDDING_BINDING_API_KEY=your-openai-api-key
+EMBEDDING_MODEL=text-embedding-3-small
+EMBEDDING_DIM=1536
 ```
-σ(c_old, c_new) = 1 - Hamming(s(c_old), s(c_new)) / 64
-```
+</details>
 
-Where s(c) is the 64-bit SimHash signature.
+<details>
+<summary><b>2 · Load the extension (Firefox / Chrome / Edge)</b></summary>
 
-**Thresholds**:
-- **τ₁ = 0.97 (Hamming ≤ 2)**: Chunks with σ ≥ τ₁ are unchanged — skip re-indexing
-- **τ₂ = 0.90 (Hamming ≥ 6)**: Chunks with σ ≤ τ₂ are semantically updated — always re-index
-- **Intermediate band [τ₂, τ₁]**: Use embedding-based SemDeDup to decide
+**Firefox:** open `about:debugging#/runtime/this-firefox`, click *Load Temporary Add-on*, and select `services/extension/dist/manifest.json`.
 
-### Retrieval Objective
+**Chrome / Edge:** open `chrome://extensions/` (or `edge://extensions/`), enable *Developer mode*, click *Load unpacked*, and select the `services/extension/dist` folder.
+</details>
 
-Scope- and freshness-aware scoring:
-```
-h(q,p) = α·sim_vec(q,p) + (1-α)·score_graph(q,p) + β·log g(p; S_q) + δ·fresh(p)
-```
+<details>
+<summary><b>3 · Connect the extension</b></summary>
 
-Where:
-- `sim_vec`: Semantic similarity (vector search)
-- `score_graph`: Graph-based evidence (entity/relation paths)
-- `g(p; S_q)`: Scope prior (1.0 if p in selected scopes, γ otherwise)
-- `fresh(p)`: Freshness signal (exponential decay from last update)
-
-**Default parameters**: α=0.8, β=0.2, δ=0.15, γ=0.1
-
-### Privacy Engineering
-- Self-hosted infrastructure: all components run locally or on user-controlled servers
-- No external data transmission: user data never leaves configured boundaries
-- Configurable API endpoints: choose cloud or local LLM providers
-- Transparent operation: full visibility into crawling, indexing, and retrieval
+Click the OwlerLite icon, set the API endpoint to `http://localhost:7001`, add your LLM keys, and click *Test connection* to verify the backend is reachable.
+</details>
 
 ---
 
-## New Features
+## Usage
 
-### Web UI (Alternative to Browser Extension)
-A full-featured Next.js web interface at `http://localhost:3000`:
-- **Query interface** with scope selection chips
-- **Score breakdown visualization** showing semantic, graph, scope, and freshness contributions
-- **Version diff modal** with highlighted additions/removals
-- **Crawler stats dashboard** showing pages, chunks, and versions
+1. **Define a scope:** open the extension, choose *New scope*, and add URL patterns (for example, `https://docs.python.org/*`) or individual pages.
+2. **Add resources:** *Add Page* includes the current browser tab. Turn on auto-tracking to capture matching pages as you browse.
+3. **Query a scope:** open the sidebar (`Ctrl+Shift+O`), type your question, and name the scope with `@` (for example, `@msmarco what is the capital of France?`). Results come only from that scope.
+4. **Inspect:** each result shows a score breakdown (semantic, graph, scope, freshness) with version and diff information.
 
-### Natural Language Rationale
-Query responses optionally include LLM-generated explanations of why results were ranked as shown. Enable with `generate_nl: true` in query requests.
+<p align="center"><img src="images/scope_search.png" alt="Scope-aware search example" width="70%"></p>
+<p align="center"><em>Querying with <code>@msmarco</code>: context drawn only from the selected collection.</em></p>
 
-### Evaluation Harness
-Offline evaluation matching the paper's TREC 2024 RAG protocol:
-```bash
-cd evaluation
-pip install -r requirements.txt
-python run_eval.py
+---
+
+## Architecture
+
+Three subsystems, mapping directly to the system described in the paper:
+
+| Subsystem | Path | Role |
+|-----------|------|------|
+| **Freshness-aware crawler** | `services/crawler/` | Monitors scope URLs, extracts main content via DOM readability heuristics, computes a 64-bit SimHash per chunk, and selectively re-ingests only semantically changed chunks. |
+| **LightRAG retrieval backend** | `services/orchestrator/`, `services/lightrag/` | Vector store plus knowledge graph, scope and version metadata, hybrid scoring, and scope-filtered candidate generation. |
+| **Browser extension and Web UI** | `services/extension/`, `services/ui/` | Conversational sidebar, scope management, provenance and score views, and crawl/freshness dashboards. |
+
+---
+
+## Method
+
+<details>
+<summary><b>Semantic freshness: two-threshold classification</b></summary>
+
+For each chunk pair, similarity is computed from 64-bit SimHash signatures `s(c)`:
+
+```
+σ(c_old, c_new) = 1 − Hamming(s(c_old), s(c_new)) / 64
 ```
 
-Implements:
-- **SF@k (Scope Fidelity)**: Fraction of top-k results from target scope
-- **SL@k (Scope Leakage)**: Fraction of top-k results outside target scope
-- **NDCG@10**: Normalized DCG with graded relevance
-- **Synthetic scope clustering**: K-means on document embeddings
+- **τ₁ = 0.97 (Hamming ≤ 2):** σ ≥ τ₁ → unchanged, skip re-indexing.
+- **τ₂ = 0.90 (Hamming ≥ 6):** σ ≤ τ₂ → semantically updated, always re-index.
+- **Intermediate band [τ₂, τ₁]:** embedding-based SemDeDup decides.
+</details>
 
-### robots.txt Compliance
-The crawler respects `robots.txt` rules with per-host caching.
+<details>
+<summary><b>Scope- and freshness-aware retrieval objective</b></summary>
 
-## Development
-
-### Project Structure
 ```
-owlerlite/
-├── services/
-│   ├── api/                  # REST API service
-│   │   ├── main.py           # API service entry point
-│   │   ├── requirements.txt  # Python dependencies
-│   │   └── Dockerfile
-│   ├── crawler/              # Web content fetching and change detection
-│   │   ├── main.go           # Crawler service entry point
-│   │   └── Dockerfile
-│   ├── frontier/             # URL queue management (URLFrontier protocol)
-│   │   ├── main.go           # Frontier service entry point
-│   │   ├── proto/            # gRPC protocol definitions
-│   │   └── Dockerfile
-│   ├── orchestrator/         # Query routing and scope management
-│   │   ├── main.go           # Orchestrator service entry point
-│   │   └── Dockerfile
-│   ├── lightrag/             # RAG backend (vector + graph)
-│   │   └── Dockerfile
-│   ├── extension/            # Browser extension
-│   │   ├── src/
-│   │   │   ├── sidebar.*     # Main query interface
-│   │   │   ├── popup.*       # Configuration interface
-│   │   │   ├── background.js # Extension orchestration
-│   │   │   └── manifest.json # Extension metadata
-│   │   ├── build.sh          # Build script
-│   │   └── dist/             # Built extension
-│   └── ui/                   # Web UI (Next.js)
-│       └── app/
-├── Makefile                  # Build and deployment automation
-├── docker-compose.yml        # Service orchestration
-└── README.md
+h(q,p) = α·sim_vec(q,p) + (1−α)·score_graph(q,p) + β·log g(p; S_q) + δ·fresh(p)
 ```
 
-## License
+- `sim_vec`: semantic similarity (vector search). `score_graph`: entity/relation path evidence.
+- `g(p; S_q)`: scope prior (1.0 if p is in the selected scopes, γ otherwise). `fresh(p)`: exponential recency decay from the last update.
+- **Default parameters:** α = 0.8, β = 0.2, δ = 0.15, γ = 0.1.
+</details>
 
-See project documentation for license information.
+---
+
+## Evaluation
+
+The paper evaluates OwlerLite with the **TREC 2024 RAG** protocol, reporting **SF@k** (scope fidelity), **SL@k** (scope leakage), and **NDCG@10** (graded relevance), with synthetic scope clustering (k-means on document embeddings). See Section 4 of the [paper](https://doi.org/10.1145/3774905.3793140) for the full setup and results.
+
+---
+
+## Related Work
+
+OwlerLite builds on prior systems and differs from them in specific ways:
+
+- **[OWLer](https://openwebindex.eu/)** (OpenWebSearch.eu): a collaborative open web crawler. OwlerLite works at a different layer. It builds persistent, scoped, versioned collections for browser RAG instead of crawling the web at large scale.
+- **[LightRAG](https://github.com/HKUDS/LightRAG)** (HKU Data Intelligence Lab): vector and knowledge-graph RAG. OwlerLite adds scope priors and freshness signals to its retrieval score.
+- **TREC 2024 RAG track:** the evaluation protocol used in the paper.
+
+Static-index RAG cannot refresh its sources, and web-search assistants discard their sources after each query. OwlerLite keeps user-defined scopes and tracks chunk-level changes over time.
+
+---
 
 ## Acknowledgments
 
-This work builds on OWLer, developed in the OpenWebSearch.eu project, and LightRAG from the HKU Data Intelligence Lab.
+This work builds on **OWLer**, developed in the OpenWebSearch.eu project, and **LightRAG**, from the HKU Data Intelligence Lab.
+
+## License
+
+Released under the [MIT License](LICENSE).
+
+<details>
+<summary><b>Project structure</b></summary>
+
+```
+owlerlite/
+├── services/
+│   ├── api/            # REST API service (Python)
+│   ├── crawler/        # Content fetching + SimHash change detection (Go)
+│   ├── frontier/       # URL queue management (URLFrontier / gRPC, Go)
+│   ├── orchestrator/   # Query routing + scope management (Go)
+│   ├── lightrag/       # RAG backend (vector + graph)
+│   ├── extension/      # Browser extension (Manifest V3, TypeScript)
+│   └── ui/             # Web UI (Next.js)
+├── Makefile            # Build and deployment automation
+├── docker-compose.yml  # Service orchestration
+└── CITATION.cff        # Machine-readable citation metadata
+```
+</details>
